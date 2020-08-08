@@ -1,23 +1,6 @@
 import os
-import pytz
-import shutil
-import logging
 import pathlib
-import requests
-import pandas as pd
-from PIL import Image
-import urllib.request
-from datetime import datetime
-from json import JSONDecodeError
-
-
-def load_logger():
-    if not os.path.isdir(log_dir):
-        os.makedirs(log_dir)
-    tz = pytz.timezone('Singapore')
-    log_path = os.path.join(log_dir, '%s-%s.log'%(datetime.now(tz).strftime('%Y%m%d'), os.path.basename(__file__).split('.')[0]))
-
-    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', filename=log_path, level=logging.DEBUG)
+from logger import load_logger, logging
 
 
 def main():
@@ -67,13 +50,22 @@ def main():
 
 
 if __name__ == '__main__':
-    data_dir = os.path.join(pathlib.Path(__file__).parent.absolute(), 'data')
-    log_dir = os.path.join(data_dir, 'logs')
+    proj_dir = pathlib.Path(__file__).parent.absolute()
+    filename = os.path.basename(__file__).split('.')[0]
+    load_logger(proj_dir, filename)
+    logging.info('>>> Script start')
+
+    import shutil
+    import requests
+    import pandas as pd
+    from PIL import Image
+    import urllib.request
+    from json import JSONDecodeError
+
+    data_dir = os.path.join(proj_dir, 'data')
     images_dir = os.path.join(data_dir, 'images')
     metadata_dir = os.path.join(data_dir, 'metadata')
 
-    load_logger()
-    logging.info('>>> Script start')
     url = 'http://datamall2.mytransport.sg/ltaodataservice/Traffic-Imagesv2'
     headers = {'AccountKey': os.environ['LTA-API-KEY']}
     main()

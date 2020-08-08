@@ -1,17 +1,7 @@
 import os
-import pytz
 import pathlib
-import logging
 from datetime import datetime
-
-
-def load_logger():
-    if not os.path.isdir(log_dir):
-        os.makedirs(log_dir)
-    tz = pytz.timezone('Singapore')
-    log_path = os.path.join(log_dir, '%s-%s.log'%(datetime.now(tz).strftime('%Y%m%d'), os.path.basename(__file__).split('.')[0]))
-
-    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', filename=log_path, level=logging.DEBUG)
+from logger import load_logger, logging
 
 
 def check_dir_name(dir_name):
@@ -128,13 +118,14 @@ def main():
 
 if __name__ == '__main__':
     proj_dir = pathlib.Path(__file__).parent.absolute()
+    filename = os.path.basename(__file__).split('.')[0]
+
+    load_logger(proj_dir, filename)
+    logging.info('>>> Script start')
+
     data_dir = os.path.join(proj_dir, 'data')
-    log_dir = os.path.join(data_dir, 'logs')
     images_dir = os.path.join(data_dir, 'images')
     detections_dir = os.path.join(data_dir, 'detections')
-
-    load_logger()
-    logging.info('>>> Script start')
 
     import numpy as np
     import pandas as pd
