@@ -73,7 +73,7 @@ if __name__ == '__main__':
     metadata_dir = os.path.join(data_dir, 'metadata')
 
     load_logger()
-    logging.info('Script start')
+    logging.info('>>> Script start')
     url = 'http://datamall2.mytransport.sg/ltaodataservice/Traffic-Imagesv2'
     headers = {'AccountKey': os.environ['LTA-API-KEY']}
     main()
