@@ -48,7 +48,7 @@ def load_model():
 
     configs = config_util.get_configs_from_pipeline_file(pipeline_config)
     model_config = configs['model']
-    # model_config.center_net.object_center_params.max_box_predictions = 200
+    model_config.center_net.object_center_params.max_box_predictions = 200
 
     detection_model = model_builder.build(model_config=model_config, is_training=False)
     ckpt = tf.compat.v2.train.Checkpoint(model=detection_model)
@@ -76,7 +76,7 @@ def run_detections_for_dir(dir_name):
 
     logging.info('%s images to process' % len(images))
     for image_file in images:
-        logging.info('Processing %s.' % image_file)
+        # logging.info('Processing %s.' % image_file)
 
         # possible to stack?
         image_path = os.path.join(images_dir, dir_name, image_file)
@@ -87,16 +87,17 @@ def run_detections_for_dir(dir_name):
 
         label_id_offset = 1
         for i in range(detections['num_detections'].numpy()[0]):
-            object_class = category_index[detections['detection_classes'][:, i].numpy()[0] + label_id_offset]['name']
             score = detections['detection_scores'][:, i].numpy()[0]
-            box = detections['detection_boxes'][:, i, :].numpy()[0]
-            relative_size = (box[2] - box[0]) * (box[3] - box[1])
+            if score > .2:
+                object_class = category_index[detections['detection_classes'][:, i].numpy()[0] + label_id_offset]['name']
+                box = detections['detection_boxes'][:, i, :].numpy()[0]
+                relative_size = (box[2] - box[0]) * (box[3] - box[1])
 
-            compiled.append([image_file,
-                             object_class,
-                             score,
-                             box[1], box[3], box[0], box[2],
-                             relative_size])
+                compiled.append([image_file,
+                                 object_class,
+                                 score,
+                                 box[1], box[3], box[0], box[2],
+                                 relative_size])
 
     detections_path = os.path.join(detections_dir, '%s_detections.csv' % dir_name)
     pd.DataFrame(compiled, columns=['image', 'class', 'score', 'x1', 'x2', 'y1', 'y2', 'relative_size']).to_csv(detections_path, index=False)
@@ -111,10 +112,12 @@ def main():
         run_detections_for_dir(dir_name)
 
         from_dir = os.path.join(images_dir, dir_name)
-        to_dir = os.path.join(images_dir, 'p' + dir_name)
-        os.rename(from_dir, to_dir)
+        # to_dir = os.path.join(images_dir, 'p' + dir_name)
+        # os.rename(from_dir, to_dir)
+        # logging.info('Images moved from %s to %s'%(from_dir, to_dir))
 
-        logging.info('Images moved from %s to %s'%(from_dir, to_dir))
+        logging.info('Deleting %s' % from_dir)
+        shutil.rmtree(from_dir)
 
 if __name__ == '__main__':
     proj_dir = pathlib.Path(__file__).parent.absolute()
@@ -123,32 +126,39 @@ if __name__ == '__main__':
     load_logger(proj_dir, filename)
     logging.info('>>> Script start')
 
-    data_dir = os.path.join(proj_dir, 'data')
-    images_dir = os.path.join(data_dir, 'images')
-    detections_dir = os.path.join(data_dir, 'detections')
+    try:
+        data_dir = os.path.join(proj_dir, 'data')
+        images_dir = os.path.join(data_dir, 'images')
+        detections_dir = os.path.join(data_dir, 'detections')
 
-    import numpy as np
-    import pandas as pd
-    from PIL import Image
-    from six import BytesIO
-    import tensorflow as tf
-    logging.info('Base libraries loaded')
+        import shutil
+        import numpy as np
+        import pandas as pd
+        from PIL import Image, ImageFile
+        ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-    from object_detection.utils import config_util
-    from object_detection.utils import label_map_util
-    from object_detection.builders import model_builder
-    logging.info('Object detection modules loaded')
+        from six import BytesIO
+        import tensorflow as tf
+        logging.info('Base libraries loaded')
 
-    if not os.path.isdir(detections_dir):
-        logging.info('Creating %s' % detections_dir)
-        os.makedirs(detections_dir)
+        from object_detection.utils import config_util
+        from object_detection.utils import label_map_util
+        from object_detection.builders import model_builder
+        logging.info('Object detection modules loaded')
 
-    detection_model, configs = load_model()
-    detect_fn = get_model_detection_function(detection_model)
-    logging.info('Model loaded.')
+        if not os.path.isdir(detections_dir):
+            logging.info('Creating %s' % detections_dir)
+            os.makedirs(detections_dir)
 
-    category_index = load_label_map()
-    logging.info('Label map loaded.')
+        detection_model, configs = load_model()
+        detect_fn = get_model_detection_function(detection_model)
+        logging.info('Model loaded.')
 
-    main()
-    logging.info('Script complete')
+        category_index = load_label_map()
+        logging.info('Label map loaded.')
+
+        main()
+    except Exception as e:
+        logging.error("Exception occurred", exc_info=True)
+    else:
+        logging.info('Script complete')
