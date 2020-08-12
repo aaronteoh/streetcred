@@ -54,19 +54,24 @@ if __name__ == '__main__':
     filename = os.path.basename(__file__).split('.')[0]
     load_logger(proj_dir, filename)
     logging.info('>>> Script start')
+    try:
+        import shutil
+        import requests
+        import pandas as pd
+        from PIL import Image
+        import urllib.request
+        from json import JSONDecodeError
 
-    import shutil
-    import requests
-    import pandas as pd
-    from PIL import Image
-    import urllib.request
-    from json import JSONDecodeError
+        data_dir = os.path.join(proj_dir, 'data')
+        images_dir = os.path.join(data_dir, 'images')
+        metadata_dir = os.path.join(data_dir, 'metadata')
 
-    data_dir = os.path.join(proj_dir, 'data')
-    images_dir = os.path.join(data_dir, 'images')
-    metadata_dir = os.path.join(data_dir, 'metadata')
-
-    url = 'http://datamall2.mytransport.sg/ltaodataservice/Traffic-Imagesv2'
-    headers = {'AccountKey': os.environ['LTA-API-KEY']}
-    main()
-    logging.info('Script complete')
+        url = 'http://datamall2.mytransport.sg/ltaodataservice/Traffic-Imagesv2'
+        with open(os.path.join(proj_dir, 'credentials/LTA-API-KEY'), 'r') as file:
+            API_KEY = file.read()
+        headers = {'AccountKey': API_KEY}
+        main()
+    except Exception as e:
+        logging.error("Exception occurred", exc_info=True)
+    else:
+        logging.info('Script complete')
