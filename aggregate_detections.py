@@ -8,16 +8,17 @@ def generate_detections_df(detections_files):
     for detections_file in detections_files:
         logging.info('Processing %s' % detections_file)
         df = pd.read_csv(os.path.join(detections_dir, detections_file))
-        ###
-        # remove overlappint detections
-        ###
+
         if detections_df is None:
             detections_df = df
         else:
             detections_df = pd.concat([detections_df, df])
 
+    detections_df['rank'] = detections_df.groupby(by=['image', 'x1', 'x2', 'y1', 'y2'])['score'].transform(lambda x: x.rank(method='first', ascending=False))
+
     detections_df = detections_df[(detections_df['score'] > .3) &
                                   (detections_df['relative_size'] < .1) &
+                                  (detections_df['rank'] == 1) &
                                   (detections_df['class'].isin(['car', 'truck', 'motorcycle', 'bus']))][['image']]
     detections_df = detections_df.groupby('image').agg(Detections=('image', 'count')).reset_index()
 
