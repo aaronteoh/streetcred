@@ -33,18 +33,19 @@ def main():
                          item['Longitude'],
                          path_split[3],
                          path_split[-1].split('_')[1],
-                         path_split[-1],
+                         path_split[-1].split('.')[0],
                          Image.open(dest_path).size]
 
             meta_df.append(meta_data)
 
+        metadata_dir = os.path.join(data_dir, 'metadata')
 
         if not os.path.isdir(metadata_dir):
             logging.info('Creating %s' % metadata_dir)
             os.makedirs(metadata_dir)
         metadata_path = os.path.join(metadata_dir, '%s_images.csv'%request_datetime)
 
-        pd.DataFrame(meta_df, columns=['CameraID', 'Latitude', 'Longitude', 'Date', 'Time', 'Filename', 'Dimensions']).to_csv(metadata_path, index=False)
+        pd.DataFrame(meta_df, columns=['CameraID', 'Latitude', 'Longitude', 'Date', 'Time', 'Filename', 'Dimensions']).to_csv(metadata_path, index=False, header=False)
         logging.info('Saved metadata to %s'%metadata_path)
 
 
@@ -64,7 +65,6 @@ if __name__ == '__main__':
 
         data_dir = os.path.join(proj_dir, 'data')
         images_dir = os.path.join(data_dir, 'images')
-        metadata_dir = os.path.join(data_dir, 'metadata')
 
         url = 'http://datamall2.mytransport.sg/ltaodataservice/Traffic-Imagesv2'
         with open(os.path.join(proj_dir, 'credentials/LTA-API-KEY'), 'r') as file:
