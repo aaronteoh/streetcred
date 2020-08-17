@@ -68,7 +68,7 @@ if __name__ == '__main__':
 
         url = 'http://datamall2.mytransport.sg/ltaodataservice/Traffic-Imagesv2'
         with open(os.path.join(proj_dir, 'credentials/LTA-API-KEY'), 'r') as file:
-            API_KEY = file.read()
+            API_KEY = file.read().strip()
         headers = {'AccountKey': API_KEY}
         main()
     except Exception as e:
