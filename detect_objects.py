@@ -6,8 +6,8 @@ from logger import load_logger, logging
 
 def load_model():
     model_name = 'centernet_resnet101_v1_fpn_512x512_coco17_tpu-8'
-    pipeline_config = os.path.join(proj_dir, 'object_detection', 'test_data', model_name, 'pipeline.config')
-    model_dir = os.path.join(proj_dir, 'object_detection', 'test_data', model_name, 'checkpoint')
+    pipeline_config = os.path.join(proj_dir, 'models/research/object_detection/test_data', model_name, 'pipeline.config')
+    model_dir = os.path.join(proj_dir, 'models/research/object_detection/test_data', model_name, 'checkpoint')
 
     configs = config_util.get_configs_from_pipeline_file(pipeline_config)
     model_config = configs['model']
@@ -177,6 +177,7 @@ if __name__ == '__main__':
         metadata_dir = os.path.join(data_dir, 'metadata')
         aggregated_dir = os.path.join(data_dir, 'aggregated')
 
+        import sys
         import shutil
         import numpy as np
         import pandas as pd
@@ -187,6 +188,7 @@ if __name__ == '__main__':
         import tensorflow as tf
         logging.info('Base libraries loaded')
 
+        sys.path.append('/models/research')
         from object_detection.utils import config_util
         from object_detection.builders import model_builder
         logging.info('Object detection modules loaded')
