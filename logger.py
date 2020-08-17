@@ -13,7 +13,7 @@ def load_logger(proj_dir, filename):
     log_path = os.path.join(log_dir, '%s-%s.log'%(datetime.now(tz).strftime('%Y%m%d'), filename))
 
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
     output_file_handler = logging.FileHandler(log_path)
     stdout_handler = logging.StreamHandler(sys.stdout)
