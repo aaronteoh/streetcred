@@ -42,10 +42,11 @@ def main():
     logging.info('%s directories to process'%len(to_process))
 
     for dir_name in to_process:
-        detections_df = run_detections_for_dir(dir_name)
-        aggregated_df = aggregate_detections(detections_df)
-        compile_detections(aggregated_df, dir_name)
-        clear_working_files(dir_name)
+        if check_if_running(dir_name):
+            detections_df = run_detections_for_dir(dir_name)
+            aggregated_df = aggregate_detections(detections_df)
+            compile_detections(aggregated_df, dir_name)
+            clear_working_files(dir_name)
 
 
 def check_dir_name(dir_name):
@@ -55,6 +56,46 @@ def check_dir_name(dir_name):
         return False
     else:
         return True
+
+
+def check_if_running(dir_name):
+    to_process = False
+    currently_detecting = None
+
+    if os.path.isfile(log_path):
+        try:
+            with open(log_path, 'r') as f:
+                currently_detecting = json.load(f)
+        except json.decoder.JSONDecodeError:
+            logging.warning('Error loading currently detecting json')
+            pass
+        else:
+            logging.info('Loaded current runs')
+
+    if currently_detecting is not None:
+        if dir_name in currently_detecting:
+            start = datetime.strptime(currently_detecting[dir_name], '%Y-%m-%d %H:%M:%S %z')
+            if (datetime.now(tz=timezone('Singapore')) - start).total_seconds() / 60 > 60:
+                logging.info('Last run for %s started over 60 minutes ago, starting parallel run'%dir_name)
+                to_process = True
+                currently_detecting[dir_name] = datetime.now(tz=timezone('Singapore')).strftime('%Y-%m-%d %H:%M:%S %z')
+            else:
+                logging.info('Last run for %s within 60 mins still running, skipping for now'%dir_name)
+        else:
+            logging.info('No current runs for %s detected'%dir_name)
+            to_process = True
+            currently_detecting[dir_name] = datetime.now(tz=timezone('Singapore')).strftime('%Y-%m-%d %H:%M:%S %z')
+
+    else:
+        logging.info('No current run logs found, generating from scratch')
+        to_process = True
+        currently_detecting = {dir_name: datetime.now(tz=timezone('Singapore')).strftime('%Y-%m-%d %H:%M:%S %z')}
+
+    if to_process:
+        with open(log_path, 'w') as f:
+            json.dump(currently_detecting, f)
+
+    return to_process
 
 
 def run_detections_for_dir(dir_name):
@@ -95,7 +136,7 @@ def run_detections_for_dir(dir_name):
     detections_df.to_csv(detections_path, index=False, header=False)
     logging.info('Saved detections to %s' % detections_path)
 
-    upload_blob(detections_path, 'detections/%s_detections.csv' % dir_name)
+    upload_blob(detections_path, 'traffic-images-detections/%s_detections.csv' % dir_name)
     os.remove(detections_path)
     logging.info('Deleted %s' % detections_path)
 
@@ -115,7 +156,7 @@ def upload_blob(source_file_name, destination_blob_name):
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename(source_file_name)
 
-    logging.info("File {} uploaded to {}.".format(source_file_name, destination_blob_name))
+    logging.info("File {} uploaded to {}".format(source_file_name, destination_blob_name))
 
 
 def aggregate_detections(detections_df):
@@ -148,7 +189,7 @@ def compile_detections(aggregated_df, dir_name):
     combined.to_csv(aggregated_path, index=False, header=False)
     logging.info('Saved aggregated data to %s' % aggregated_path)
 
-    upload_blob(aggregated_path, 'aggregated/%s_aggregated.csv' % dir_name)
+    upload_blob(aggregated_path, 'traffic-images-aggregated/%s_aggregated.csv' % dir_name)
     os.remove(aggregated_path)
     logging.info('Deleted %s' % aggregated_path)
 
@@ -162,6 +203,18 @@ def clear_working_files(dir_name):
     os.remove(metadata_path)
     logging.info('Deleted %s' % metadata_path)
 
+    try:
+        with open(log_path, 'r') as f:
+            currently_detecting = json.load(f)
+    except json.decoder.JSONDecodeError:
+        logging.warning('Error loading currently detecting json')
+        pass
+    else:
+        if dir_name in currently_detecting:
+            currently_detecting.pop(dir_name)
+            with open(log_path, 'w') as f:
+                json.dump(currently_detecting, f)
+
 
 if __name__ == '__main__':
     proj_dir = pathlib.Path(__file__).parent.absolute()
@@ -172,15 +225,18 @@ if __name__ == '__main__':
 
     try:
         data_dir = os.path.join(proj_dir, 'data')
-        images_dir = os.path.join(data_dir, 'images')
-        detections_dir = os.path.join(data_dir, 'detections')
-        metadata_dir = os.path.join(data_dir, 'metadata')
-        aggregated_dir = os.path.join(data_dir, 'aggregated')
+        images_dir = os.path.join(data_dir, 'traffic-images-raw')
+        detections_dir = os.path.join(data_dir, 'traffic-images-detections')
+        metadata_dir = os.path.join(data_dir, 'traffic-images-metadata')
+        aggregated_dir = os.path.join(data_dir, 'traffic-images-aggregated')
+        log_path = os.path.join(data_dir, 'logs', 'currently_detecting.json')
 
         import sys
+        import json
         import shutil
         import numpy as np
         import pandas as pd
+        from pytz import timezone
         from PIL import Image, ImageFile
         ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -194,12 +250,12 @@ if __name__ == '__main__':
         logging.info('Object detection modules loaded')
 
         from google.cloud import storage
-        key_path = os.path.join(pathlib.Path(__file__).parent.absolute(), 'credentials','tyeoh-cloud-da52d6b77ebd.json')
+        key_path = os.path.join(pathlib.Path(__file__).parent.absolute(), 'credentials','GOOGLE-CLOUD-CREDENTIALS.json')
         storage_client = storage.Client.from_service_account_json(key_path)
 
         detection_model, configs = load_model()
         detect_fn = get_model_detection_function(detection_model)
-        logging.info('Model loaded.')
+        logging.info('Model loaded')
 
         main()
     except Exception as e:
