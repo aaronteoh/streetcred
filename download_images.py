@@ -38,7 +38,7 @@ def main():
 
             meta_df.append(meta_data)
 
-        metadata_dir = os.path.join(data_dir, 'metadata')
+        metadata_dir = os.path.join(data_dir, 'traffic-images-metadata')
 
         if not os.path.isdir(metadata_dir):
             logging.info('Creating %s' % metadata_dir)
@@ -64,7 +64,7 @@ if __name__ == '__main__':
         from json import JSONDecodeError
 
         data_dir = os.path.join(proj_dir, 'data')
-        images_dir = os.path.join(data_dir, 'images')
+        images_dir = os.path.join(data_dir, 'traffic-images-raw')
 
         url = 'http://datamall2.mytransport.sg/ltaodataservice/Traffic-Imagesv2'
         with open(os.path.join(proj_dir, 'credentials/LTA-API-KEY'), 'r') as file:
