@@ -14,4 +14,4 @@
 5,20,35,50 * * * * sudo python3 /opt/repositories/streetcred/detect_objects.py
 
 # download lta realtime data
-2,17,32,47 * * * * sudo python3 /opt/repositories/streetcred/lta_datamall_realtime.py
+0,15,30,45 * * * * sudo python3 /opt/repositories/streetcred/lta_datamall_realtime.py
