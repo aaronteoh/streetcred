@@ -19,7 +19,7 @@ $ sudo mkdir /opt/repositories
 $ cd /opt/repositories
 $ sudo git clone https://github.com/aaronteoh/streetcred.git
 
-# install dependanciwes
+# install dependancies
 $ cd streetcred
 $ sudo pip3 install -r requirements.txt
 
@@ -37,9 +37,14 @@ $ sudo git clone https://github.com/tensorflow/models.git
 $ cd models/research
 $ sudo apt  install protobuf-compiler
 $ sudo protoc object_detection/protos/*.proto --python_out=.
-$ cp object_detection/packages/tf2/setup.py .
+$ sudo cp object_detection/packages/tf2/setup.py .
 $ sudo python3 -m pip install .
 $ sudo python3 object_detection/builders/model_builder_tf2_test.py
+
+# TODO: figure out what this is
+# ERROR: tensorflow 2.3.0 has requirement numpy<1.19.0,>=1.16.0, but you'll have numpy 1.19.1 which is incompatible.
+# ERROR: apache-beam 2.23.0 has requirement avro-python3!=1.9.2,<1.10.0,>=1.8.1; python_version >= "3.0", but you'll have avro-python3 1.10.0 which is incompatible.
+# ERROR: tensorflow-metadata 0.23.0 has requirement absl-py<0.9,>=0.7, but you'll have absl-py 0.10.0 which is incompatible.
 
 
 # TODO: figure out what this is
@@ -52,11 +57,9 @@ $ sudo python3 object_detection/builders/model_builder_tf2_test.py
 # tensorflow-metadata 0.23.0 requires absl-py<0.9,>=0.7, but you'll have absl-py 0.9.0 which is incompatible.
 
 # set up GCP credentials
-# outside ssh
-$ gcloud compute scp <path to gcs credentials> tyeoh-streetcred-1:<file name>
-# insihde ssh
+# inside ssh, click on settings button, upload file, then upload credentials file
 $ cd /home/$USER
-$ mv <file name> /opt/repositories/streetcred/credentials/<file name>
+$ sudo mv <file name> /opt/repositories/streetcred/credentials/<file name>
 $ cd /opt/repositories/streetcred/models/research/object_detection/test_data
 $ sudo curl -O http://download.tensorflow.org/models/object_detection/tf2/20200711/centernet_resnet101_v1_fpn_512x512_coco17_tpu-8.tar.gz
 $ sudo tar -zxvf centernet_resnet101_v1_fpn_512x512_coco17_tpu-8.tar.gz
@@ -64,5 +67,7 @@ $ sudo tar -zxvf centernet_resnet101_v1_fpn_512x512_coco17_tpu-8.tar.gz
 # test script
 $ cd /opt/repositories/streetcred
 $ sudo python3 detect_objects.py
+
+$ sudo crontab /opt/repositories/streetcred/crontab
 
 # debug: tail -f /var/log/kern.log
