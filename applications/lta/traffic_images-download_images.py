@@ -1,5 +1,17 @@
-import os
-import pathlib
+import os, pathlib, sys
+
+app_dir = pathlib.Path(__file__).parent.absolute()
+filename = os.path.basename(__file__).split('.')[0]
+
+proj_dir = app_dir
+while True:
+    parent, subdir = os.path.split(proj_dir)
+    if subdir == 'streetcred':
+        break
+    else:
+        proj_dir = parent
+
+sys.path.append(proj_dir)
 from logger import load_logger, logging
 
 
@@ -25,6 +37,8 @@ def main():
         logging.info('Downloading images to %s'%dest_dir)
         for item in r:
             dest_path = os.path.join(dest_dir, item['ImageLink'].split('?')[0].split('/')[-1])
+
+            # add retry here
             urllib.request.urlretrieve(item['ImageLink'], dest_path)
 
             path_split = item['ImageLink'].split('?')[0].split('/')
@@ -51,17 +65,6 @@ def main():
 
 
 if __name__ == '__main__':
-    app_dir = pathlib.Path(__file__).parent.absolute()
-    filename = os.path.basename(__file__).split('.')[0]
-
-    proj_dir = app_dir
-    while True:
-        parent, subdir = os.path.split(proj_dir)
-        if subdir == 'streetcred':
-            break
-        else:
-            proj_dir = parent
-
     load_logger(app_dir, filename)
     logging.info('>>> Script start')
     try:
