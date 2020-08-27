@@ -58,18 +58,26 @@ def main():
 
 
 if __name__ == '__main__':
-    proj_dir = pathlib.Path(__file__).parent.absolute()
+    app_dir = pathlib.Path(__file__).parent.absolute()
     filename = os.path.basename(__file__).split('.')[0]
 
-    load_logger(proj_dir, filename)
+    proj_dir = app_dir
+    while True:
+        parent, subdir = os.path.split(proj_dir)
+        if subdir == 'streetcred':
+            break
+        else:
+            proj_dir = parent
+
+    load_logger(app_dir, filename)
     logging.info('>>> Script start')
 
     try:
         from google.cloud import storage
-        key_path = os.path.join(pathlib.Path(__file__).parent.absolute(), '../../credentials', 'GOOGLE-CLOUD-CREDENTIALS.json')
+        key_path = os.path.join(proj_dir, 'credentials', 'GOOGLE-CLOUD-CREDENTIALS.json')
         storage_client = storage.Client.from_service_account_json(key_path)
 
-        data_dir = os.path.join(proj_dir, '../../data')
+        data_dir = os.path.join(app_dir, 'data')
         if not os.path.isdir(data_dir):
             os.makedirs(data_dir)
             logging.info('Created %s' % data_dir)

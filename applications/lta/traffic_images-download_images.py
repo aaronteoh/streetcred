@@ -51,9 +51,18 @@ def main():
 
 
 if __name__ == '__main__':
-    proj_dir = pathlib.Path(__file__).parent.absolute()
+    app_dir = pathlib.Path(__file__).parent.absolute()
     filename = os.path.basename(__file__).split('.')[0]
-    load_logger(proj_dir, filename)
+
+    proj_dir = app_dir
+    while True:
+        parent, subdir = os.path.split(proj_dir)
+        if subdir == 'streetcred':
+            break
+        else:
+            proj_dir = parent
+
+    load_logger(app_dir, filename)
     logging.info('>>> Script start')
     try:
         import shutil
@@ -63,11 +72,11 @@ if __name__ == '__main__':
         import urllib.request
         from json import JSONDecodeError
 
-        data_dir = os.path.join(proj_dir, '../../data')
+        data_dir = os.path.join(app_dir, 'data')
         images_dir = os.path.join(data_dir, 'traffic-images-raw')
 
         url = 'http://datamall2.mytransport.sg/ltaodataservice/Traffic-Imagesv2'
-        with open(os.path.join(proj_dir, '../../credentials/LTA-API-KEY'), 'r') as file:
+        with open(os.path.join(proj_dir, 'credentials/LTA-API-KEY'), 'r') as file:
             API_KEY = file.read().strip()
         headers = {'AccountKey': API_KEY}
         main()

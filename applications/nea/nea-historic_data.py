@@ -128,14 +128,22 @@ if __name__ == '__main__':
     start_date = '2017-01-01'
     end_date = '2017-01-31'
 
-    proj_dir = pathlib.Path(__file__).parent.absolute()
+    app_dir = pathlib.Path(__file__).parent.absolute()
     filename = os.path.basename(__file__).split('.')[0]
 
-    load_logger(proj_dir, filename)
+    proj_dir = app_dir
+    while True:
+        parent, subdir = os.path.split(proj_dir)
+        if subdir == 'streetcred':
+            break
+        else:
+            proj_dir = parent
+
+    load_logger(app_dir, filename)
     logging.info('>>> Script start')
 
     try:
-        data_dir = os.path.join(proj_dir, '../../data')
+        data_dir = os.path.join(app_dir, 'data')
         for api in ['uv-index', 'psi', '2-hour-weather-forecast', 'pm25', 'air-temperature']:
             logging.info('Running script for %s API from %s to %s'%(api, start_date, end_date))
             downloader = nea_downloader(api)
