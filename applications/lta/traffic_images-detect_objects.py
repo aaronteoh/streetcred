@@ -1,7 +1,20 @@
-import os
-import pathlib
+import os, pathlib, sys
 from datetime import datetime
+
+app_dir = pathlib.Path(__file__).parent.absolute()
+filename = os.path.basename(__file__).split('.')[0]
+
+proj_dir = app_dir
+while True:
+    parent, subdir = os.path.split(proj_dir)
+    if subdir == 'streetcred':
+        break
+    else:
+        proj_dir = parent
+
+sys.path.append(proj_dir)
 from logger import load_logger, logging
+
 
 
 def load_model():
@@ -217,17 +230,6 @@ def clear_working_files(dir_name):
 
 
 if __name__ == '__main__':
-    app_dir = pathlib.Path(__file__).parent.absolute()
-    filename = os.path.basename(__file__).split('.')[0]
-
-    proj_dir = app_dir
-    while True:
-        parent, subdir = os.path.split(proj_dir)
-        if subdir == 'streetcred':
-            break
-        else:
-            proj_dir = parent
-
     load_logger(app_dir, filename)
     logging.info('>>> Script start')
 

@@ -1,10 +1,22 @@
-import os
-import pytz
-import pathlib
-import pandas as pd
+import os, pathlib, sys
 from datetime import datetime
-from utils import datamall_load, upload_blob
+import pytz
+import pandas as pd
+
+app_dir = pathlib.Path(__file__).parent.absolute()
+filename = os.path.basename(__file__).split('.')[0]
+
+proj_dir = app_dir
+while True:
+    parent, subdir = os.path.split(proj_dir)
+    if subdir == 'streetcred':
+        break
+    else:
+        proj_dir = parent
+
+sys.path.append(proj_dir)
 from logger import load_logger, logging
+from utils import datamall_load, upload_blob
 
 
 apis = {
@@ -58,17 +70,6 @@ def main():
 
 
 if __name__ == '__main__':
-    app_dir = pathlib.Path(__file__).parent.absolute()
-    filename = os.path.basename(__file__).split('.')[0]
-
-    proj_dir = app_dir
-    while True:
-        parent, subdir = os.path.split(proj_dir)
-        if subdir == 'streetcred':
-            break
-        else:
-            proj_dir = parent
-
     load_logger(app_dir, filename)
     logging.info('>>> Script start')
 
