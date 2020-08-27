@@ -8,10 +8,10 @@
 # *  *  *  *  * user-name command to be executed
 
 # run download images
-0,15,30,45 * * * * sudo python3 /opt/repositories/streetcred/download_images.py
+0,15,30,45 * * * * sudo python3 /opt/repositories/streetcred/applications/lta/traffic_images-download_images.py
 
 # run detect objects
-5,20,35,50 * * * * sudo python3 /opt/repositories/streetcred/detect_objects.py
+5,20,35,50 * * * * sudo python3 /opt/repositories/streetcred/applications/lta/traffic_images-detect_objects.py
 
 # download lta realtime data
-0,15,30,45 * * * * sudo python3 /opt/repositories/streetcred/lta_datamall_realtime.py
+0,15,30,45 * * * * sudo python3 /opt/repositories/streetcred/applications/lta/datamall-realtime_data.py
