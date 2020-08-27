@@ -14,7 +14,7 @@ while True:
 
 sys.path.append(proj_dir)
 from logger import load_logger, logging
-
+from utils import upload_blob
 
 
 def load_model():
@@ -149,7 +149,7 @@ def run_detections_for_dir(dir_name):
     detections_df.to_csv(detections_path, index=False, header=False)
     logging.info('Saved detections to %s' % detections_path)
 
-    upload_blob(detections_path, 'traffic-images-detections/%s_detections.csv' % dir_name)
+    upload_blob(bucket, detections_path, 'traffic-images-detections/%s_detections.csv' % dir_name)
     os.remove(detections_path)
     logging.info('Deleted %s' % detections_path)
 
@@ -162,14 +162,6 @@ def load_image_into_numpy_array(path):
     (im_width, im_height) = image.size
 
     return np.array(image.getdata()).reshape((im_height, im_width, 3)).astype(np.uint8)
-
-
-def upload_blob(source_file_name, destination_blob_name):
-    bucket = storage_client.bucket('tyeoh-streetcred')
-    blob = bucket.blob(destination_blob_name)
-    blob.upload_from_filename(source_file_name)
-
-    logging.info("File {} uploaded to {}".format(source_file_name, destination_blob_name))
 
 
 def aggregate_detections(detections_df):
@@ -202,7 +194,7 @@ def compile_detections(aggregated_df, dir_name):
     combined.to_csv(aggregated_path, index=False, header=False)
     logging.info('Saved aggregated data to %s' % aggregated_path)
 
-    upload_blob(aggregated_path, 'traffic-images-aggregated/%s_aggregated.csv' % dir_name)
+    upload_blob(bucket, aggregated_path, 'traffic-images-aggregated/%s_aggregated.csv' % dir_name)
     os.remove(aggregated_path)
     logging.info('Deleted %s' % aggregated_path)
 
@@ -262,6 +254,9 @@ if __name__ == '__main__':
         from google.cloud import storage
         key_path = os.path.join(proj_dir, 'credentials', 'GOOGLE-CLOUD-CREDENTIALS.json')
         storage_client = storage.Client.from_service_account_json(key_path)
+        with open(key_path, 'r') as f:
+            project_id = json.load(f)['project_id']
+        bucket = storage_client.bucket('tyeoh-streetcred', user_project=project_id)
 
         detection_model, configs = load_model()
         detect_fn = get_model_detection_function(detection_model)

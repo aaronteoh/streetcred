@@ -38,8 +38,7 @@ def datamall_load(url):
 
 
 
-def upload_blob(storage_client, source_file_name, destination_blob_name):
-    bucket = storage_client.bucket('tyeoh-streetcred')
+def upload_blob(bucket, source_file_name, destination_blob_name):
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename(source_file_name)
 

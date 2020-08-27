@@ -1,4 +1,4 @@
-import os, pathlib, sys
+import json, os, pathlib, sys
 from datetime import datetime
 import pytz
 import pandas as pd
@@ -64,7 +64,7 @@ def main():
         df.to_csv(dest_path, index=False, header=False)
         logging.info('Saved data to %s'%dest_path)
 
-        upload_blob(storage_client, dest_path, '%s/%s_%s.csv' % (api, request_datetime, api))
+        upload_blob(bucket, dest_path, '%s/%s_%s.csv' % (api, request_datetime, api))
         os.remove(dest_path)
         logging.info('Deleted %s' % dest_path)
 
@@ -77,6 +77,9 @@ if __name__ == '__main__':
         from google.cloud import storage
         key_path = os.path.join(proj_dir, 'credentials', 'GOOGLE-CLOUD-CREDENTIALS.json')
         storage_client = storage.Client.from_service_account_json(key_path)
+        with open(key_path, 'r') as f:
+            project_id = json.load(f)['project_id']
+        bucket = storage_client.bucket('tyeoh-streetcred', user_project=project_id)
 
         data_dir = os.path.join(app_dir, 'data')
         if not os.path.isdir(data_dir):
