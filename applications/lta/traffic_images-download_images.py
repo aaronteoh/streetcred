@@ -1,4 +1,5 @@
 import os, pathlib, sys
+from retrying import retry
 
 app_dir = pathlib.Path(__file__).parent.absolute()
 filename = os.path.basename(__file__).split('.')[0]
@@ -13,6 +14,19 @@ while True:
 
 sys.path.append(proj_dir)
 from logger import load_logger, logging
+
+
+def retry_if_urlerror(exception):
+    return isinstance(exception, urllib.error.URLError)
+
+
+@retry(retry_on_exception=retry_if_urlerror,wait_fixed=3000, stop_max_attempt_number=3)
+def download_image(source, destination):
+    try:
+        urllib.request.urlretrieve(source, destination)
+    except urllib.error.URLError as e:
+        logging.error(e)
+        raise urllib.error.URLError
 
 
 def main():
@@ -38,8 +52,7 @@ def main():
         for item in r:
             dest_path = os.path.join(dest_dir, item['ImageLink'].split('?')[0].split('/')[-1])
 
-            # add retry here
-            urllib.request.urlretrieve(item['ImageLink'], dest_path)
+            download_image(item['ImageLink'], dest_path)
 
             path_split = item['ImageLink'].split('?')[0].split('/')
             meta_data = [item['CameraID'],
@@ -71,8 +84,10 @@ if __name__ == '__main__':
         import shutil
         import requests
         import pandas as pd
-        from PIL import Image
+        import urllib.error
         import urllib.request
+        from PIL import Image
+
         from json import JSONDecodeError
 
         data_dir = os.path.join(app_dir, 'data')
