@@ -39,9 +39,14 @@ Details for the available datasets as follows:
 
 <br><br>
 # Downloading Data
-To download data, run `download_from_gcs.py` which is found in `applications/lta`.
+The GCS bucket is currently set to `Requester pays`, one way to set up credentials to be able to download the data is:
+1. Create service account in your project, ensure project has attached billing account.
+2. Ensure service account has `Service Usage Consume` role under IAM.
+3. Go to `Service Accounts` and create a JSON key. Download and rename the key to `GOOGLE-CLOUD-CREDENTIALS.json`, saving it under `/streetcred/credentials/`  
 
-Enter start and end dates, comment out datasets which are not required.
+There are other authentication methods too, some require minor edits to the code. With the authentication method set up, you can now run the script to download historic data.
+1. To download data, run `download_from_gcs.py` which is found in `applications/lta`.
+2. Enter start and end dates, comment out datasets which are not required.
 
 <br><br>
 # Contribute
@@ -50,7 +55,7 @@ Looking forward to incorporate improvements to the code, or let me know if I'm m
 This currently costs abit to download, process and store the data, so I'd be more than happy to accept financial contributions. Contributions above the requirements of the current set up will go towards upgrading the instance to run the task more frequently (max once every 5 minutes, the source update frequency of the datasets here).
 
 <br><br>
-# Running the downloader on your own instance
+# Running the real time downloader on your own instance
 1. Create service account. Required permissions:
     - Monitoring (https://cloud.google.com/monitoring/access-control) and storage admin
 
