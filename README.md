@@ -146,5 +146,5 @@ Require instance specs for start-up:
 
 ### If task fails at any step without trace printed, can review logs with:
 ```
-$ debug: tail -f /var/log/kern.log
+$ tail -f /var/log/kern.log
 ```
