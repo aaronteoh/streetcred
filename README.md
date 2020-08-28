@@ -1,14 +1,13 @@
 # streetcred
 Watching over Singapore's roads via LTA DataMaill APIs
-
-
+<br><br>
 LTA DataMall API: https://www.mytransport.sg/content/dam/datamall/datasets/LTA_DataMall_API_User_Guide.pdf
 
 Downloads selected LTA DataMall datasets every 15 mins to Google Cloud Storage.
-
+<br><br>
 Details for the available datasets as follows:
 
-- ###traffic-images-detections:
+- ### traffic-images-detections:
     - Derieved from LTA's traffic images API
     - Traffic images (from expressway cameras) are passed through an object detection model (CenterNet Resnet101 V1 FPN 512x512)
     - Top 200 detections with score > 0.2 are saved (number of detections per image can be lower than 200) 
@@ -16,42 +15,42 @@ Details for the available datasets as follows:
     - Image classes map to label can be found in `metadata` directory
     - Schema: ['image', 'class', 'score', 'x1', 'x2', 'y1', 'y2', 'relative_size']
     
-- ###traffic-images-aggregated:
+- ### traffic-images-aggregated:
     - From `traffic-images-detections`, addtional filtering to obtain more reliable count of number of vehicles in feed 
     - Schema: ['CameraID', 'Latitude', 'Longitude', 'Date', 'Time', 'Filename', 'Dimensions', 'Detections']
     
-- ###carpark-availability:
+- ### carpark-availability:
     - Direct from API, removed metadata to keep data concise
     - Location of carparks can be found in `metdata` directory 
     - Schema: ['AvailableLots', 'CarParkID']
 
-- ###taxi-availability:
+- ### taxi-availability:
     - Direct from API 
     - Schema: ['Latitude', 'Longitude]
 
-- ###traffic-incidents:
+- ### traffic-incidents:
     - Direct from API 
     - Schema: ['Latitude', 'Longitude', 'Message', 'Type']
     
-- ###traffic-speed-bands
+- ### traffic-speed-bands
     - Direct from API, remvoed metadata to keep data concinse
     - Coordinates of road stretches can be found in `metadata` directory
     - Schema: ['LinkID', 'MinimumSpeed']
 
-
-#Downloading Data
+<br><br>
+# Downloading Data
 To download data, run `download_from_gcs.py` which is found in `applications/lta`.
 
 Enter start and end dates, comment out datasets which are not required.
 
-
-#Contribute
+<br><br>
+# Contribute
 Looking forward to incorporate improvements to the code, or let me know if I'm missing something out.
 
 This currently costs abit to download, process and store the data, so I'd be more than happy to accept financial contributions. Contributions above the requirements of the current set up will go towards upgrading the instance to run the task more frequently (max once every 5 minutes, the source update frequency of the datasets here).
 
-
-#Running the downloader on your own instance
+<br><br>
+# Running the downloader on your own instance
 1. Create service account. Required permissions:
     - Monitoring (https://cloud.google.com/monitoring/access-control) and storage admin
 
@@ -145,7 +144,7 @@ Require instance specs for start-up:
 
 18. To save costs, can scale down instance from n1-standard-1 to n1 custom, 1 vCPU, 2.25 GB memory
 
-###If task fails at any step without trace printed, can review logs with:
+### If task fails at any step without trace printed, can review logs with:
 ```
 $ debug: tail -f /var/log/kern.log
 ```
