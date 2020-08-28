@@ -145,6 +145,6 @@ Require instance specs for start-up:
 18. To save costs, can scale down instance from n1-standard-1 to n1 custom, 1 vCPU, 2.25 GB memory
 
 ### If task fails at any step without trace printed, can review logs with:
-```
-$ tail -f /var/log/kern.log
-```
+    ```
+    $ tail -f /var/log/kern.log
+    ```
