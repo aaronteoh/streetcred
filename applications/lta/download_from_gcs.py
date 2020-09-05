@@ -59,7 +59,7 @@ def download_data(dataset, destination_dir, start_date, end_date, review_only=Fa
     for n in range(int((end_datetime - start_datetime).days) + 1):
         run_date = (start_datetime + timedelta(n)).strftime('%Y%m%d')
         to_download = [x for x in all_blobs if x.startswith(run_date) and x.endswith('_%s.csv'%datasets[dataset])]
-        print('%s: %s files found'%(run_date, len(to_download)))
+        print('[%s] %s: %s files found'%(run_date, dataset, len(to_download)))
 
         if not review_only:
             for file in to_download:
@@ -84,4 +84,4 @@ if __name__ == '__main__':
 
     for dataset in datasets:
         destination_dir = os.path.join(app_dir, 'downloads', dataset)
-        download_data(dataset, destination_dir, start_date, end_date)
+        download_data(dataset, destination_dir, start_date, end_date, review_only=False)
