@@ -143,13 +143,13 @@ def run_detections_for_dir(dir_name):
         os.makedirs(detections_dir)
         logging.info('Created %s' % detections_dir)
 
-    detections_path = os.path.join(detections_dir, '%s_detections.csv' % dir_name)
+    detections_path = os.path.join(detections_dir, '%s_detections.csv.xz' % dir_name)
     detections_df = pd.DataFrame(compiled, columns=['image', 'class', 'score', 'x1', 'x2', 'y1', 'y2', 'relative_size'])
     logging.info('Detections DF shape: %s' % str(detections_df.shape))
-    detections_df.to_csv(detections_path, index=False, header=False)
+    detections_df.to_csv(detections_path, index=False, header=False, compression='xz')
     logging.info('Saved detections to %s' % detections_path)
 
-    upload_blob(bucket, detections_path, 'traffic-images-detections/%s_detections.csv' % dir_name)
+    upload_blob(bucket, detections_path, 'traffic-images-detections/%s_detections.csv.xz' % dir_name)
     os.remove(detections_path)
     logging.info('Deleted %s' % detections_path)
 
@@ -190,11 +190,11 @@ def compile_detections(aggregated_df, dir_name):
         os.makedirs(aggregated_dir)
         logging.info('Created %s' % aggregated_dir)
 
-    aggregated_path = os.path.join(aggregated_dir, '%s_aggregated.csv' % dir_name)
-    combined.to_csv(aggregated_path, index=False, header=False)
+    aggregated_path = os.path.join(aggregated_dir, '%s_aggregated.csv.xz' % dir_name)
+    combined.to_csv(aggregated_path, index=False, header=False, compression='xz')
     logging.info('Saved aggregated data to %s' % aggregated_path)
 
-    upload_blob(bucket, aggregated_path, 'traffic-images-aggregated/%s_aggregated.csv' % dir_name)
+    upload_blob(bucket, aggregated_path, 'traffic-images-aggregated/%s_aggregated.csv.xz' % dir_name)
     os.remove(aggregated_path)
     logging.info('Deleted %s' % aggregated_path)
 
