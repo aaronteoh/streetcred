@@ -60,11 +60,11 @@ def main():
         if not os.path.isdir(dest_dir):
             os.makedirs(dest_dir)
             logging.info('Created %s' % dest_dir)
-        dest_path = os.path.join(dest_dir, '%s_%s.csv'%(request_datetime, api))
-        df.to_csv(dest_path, index=False, header=False)
+        dest_path = os.path.join(dest_dir, '%s_%s.csv.xz'%(request_datetime, api))
+        df.to_csv(dest_path, index=False, header=False, compression='xz')
         logging.info('Saved data to %s'%dest_path)
 
-        upload_blob(bucket, dest_path, '%s/%s_%s.csv' % (api, request_datetime, api))
+        upload_blob(bucket, dest_path, '%s/%s_%s.csv.xz' % (api, request_datetime, api))
         os.remove(dest_path)
         logging.info('Deleted %s' % dest_path)
 
