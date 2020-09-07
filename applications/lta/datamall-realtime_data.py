@@ -20,12 +20,12 @@ from utils import datamall_load, upload_blob
 
 
 apis = {
-    'taxi-availability': {'url': 'http://datamall2.mytransport.sg/ltaodataservice/Taxi-Availability',
-                          'fields': ['Latitude', 'Longitude']
-                          },
     'carpark-availability': {'url': 'http://datamall2.mytransport.sg/ltaodataservice/CarParkAvailabilityv2',
                              'fields': ['AvailableLots', 'CarParkID']
                              },
+    'taxi-availability': {'url': 'http://datamall2.mytransport.sg/ltaodataservice/Taxi-Availability',
+                          'fields': ['Latitude', 'Longitude']
+                          },
     'traffic-incidents': {'url': 'http://datamall2.mytransport.sg/ltaodataservice/TrafficIncidents',
                           'fields': ['Latitude', 'Longitude', 'Message', 'Type']
                           },
