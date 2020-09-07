@@ -1,5 +1,5 @@
 # streetcred
-Watching over Singapore's roads via LTA DataMaill APIs
+Watching over Singapore's roads via LTA DataMall APIs
 <br><br>
 LTA DataMall API: https://www.mytransport.sg/content/dam/datamall/datasets/LTA_DataMall_API_User_Guide.pdf
 
@@ -22,20 +22,20 @@ Details for the available datasets as follows:
 - ### carpark-availability:
     - Direct from API, removed metadata to keep data concise
     - Location of carparks can be found in `metdata` directory 
-    - Schema: ['AvailableLots', 'CarParkID']
+    - Schema: ['Time', 'AvailableLots', 'CarParkID']
 
 - ### taxi-availability:
     - Direct from API 
-    - Schema: ['Latitude', 'Longitude]
+    - Schema: ['Time', 'Latitude', 'Longitude']
 
 - ### traffic-incidents:
     - Direct from API 
-    - Schema: ['Latitude', 'Longitude', 'Message', 'Type']
+    - Schema: ['Time', 'Latitude', 'Longitude', 'Message', 'Type']
     
 - ### traffic-speed-bands
     - Direct from API, remvoed metadata to keep data concinse
     - Coordinates of road stretches can be found in `metadata` directory
-    - Schema: ['LinkID', 'MinimumSpeed']
+    - Schema: ['Time', 'LinkID', 'MinimumSpeed']
 
 <br><br>
 # Downloading Data
