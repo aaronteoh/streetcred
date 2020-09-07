@@ -1,5 +1,6 @@
 import os, pathlib, sys
 from retrying import retry
+from time import sleep
 
 app_dir = pathlib.Path(__file__).parent.absolute()
 filename = os.path.basename(__file__).split('.')[0]
@@ -31,11 +32,20 @@ def download_image(source, destination):
 
 def main():
     try:
-        r = requests.get(url, headers=headers).json()['value']
+        retry_count = 0
+        image_count = 0
+        while retry_count < 4  and image_count < 87:
+            r = requests.get(url, headers=headers).json()['value']
+            image_count = len(r)
+            logging.info('%s items found.' % image_count)
+            if image_count < 87:
+                logging.warning('Image count < 87')
+                retry_count+=1
+                sleep(5)
+
     except JSONDecodeError as e:
         logging.exception("JSONDecodeError")
     else:
-        logging.info('%s items found.'%len(r))
         path_split = r[0]['ImageLink'].split('?')[0].split('/')
         request_datetime = ('%s%s'%(path_split[3], path_split[4])).replace('-', '')
         dest_dir = os.path.join(images_dir, request_datetime)
