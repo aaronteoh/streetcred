@@ -13,5 +13,8 @@
 # download lta realtime data
 0,15,30,45 * * * * sudo python3 /opt/repositories/streetcred/applications/lta/datamall-realtime_data.py
 
+# download lta realtime data metadata for selected feeds
+0 0 1 * * sudo python3 /opt/repositories/streetcred/applications/lta/datamall-generate_metadata.py
+
 # clear logs
 1 1 1 * * sudo python3 /opt/repositories/streetcred/clear_logs.py
