@@ -58,8 +58,12 @@ def download_data(dataset, destination_dir, start_date, end_date, review_only=Fa
 
     for n in range(int((end_datetime - start_datetime).days) + 1):
         run_date = (start_datetime + timedelta(n)).strftime('%Y%m%d')
-        to_download = [x for x in all_blobs if x.startswith(run_date) and x.endswith('_%s.csv.xz'%datasets[dataset])]
-        print('[%s] %s: %s files found'%(run_date, dataset, len(to_download)))
+
+        if not dataset.endswith('_metadata') or run_date.endswith('01'):
+            to_download = [x for x in all_blobs if x.startswith(run_date) and x.endswith('_%s.csv.xz'%datasets[dataset])]
+            print('[%s] %s: %s files found'%(run_date, dataset, len(to_download)))
+        else:
+            to_download = []
 
         if not review_only:
             for file in to_download:
@@ -79,8 +83,11 @@ if __name__ == '__main__':
                 'traffic-incidents': 'traffic-incidents',
                 'traffic-speed-bands': 'traffic-speed-bands',
                 'traffic-images-aggregated': 'aggregated',
-                'traffic-images-detections': 'detections'
-                }
+                'traffic-images-detections': 'detections',
+
+                'carpark-availability_metadata': 'carpark-availability_metadata',
+                'traffic-speed-bands_metadata': 'traffic-speed-bands_metadata',
+    }
 
     for dataset in datasets:
         destination_dir = os.path.join(app_dir, 'downloads', dataset)
